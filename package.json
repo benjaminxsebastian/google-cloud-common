@@ -1,6 +1,6 @@
 {
     "name": "@benjamin.x.sebastian/google-cloud-common",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Common functionality used in Google Cloud.",
     "repository": "github:benjaminxsebastian/google-cloud-common",
     "license": "Apache-2.0",
