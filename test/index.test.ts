@@ -31,6 +31,7 @@ import {
     CLOUD_BILLING_API,
     getProjectIdentifier,
     enableServiceForProject,
+    initializeServiceAPIForProject,
     validateCloudBillingAccount,
     initializeGoogleCloudCommon
 } from '../src/index';
@@ -322,6 +323,91 @@ describe('Test functions in index: ', () => {
                 ENABLE_SERVICE_REQUEST_SERVICE_NAME
             );
             expect(mockEnableServiceResponsePromise).toHaveBeenCalledTimes(1);
+        });
+
+        afterEach(() => {
+            expect(mockListBillingAccounts).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Testing initializeServiceAPIForProject(): ', () => {
+        test('projectIdentifier undefined', async () => {
+            const TEST_PROJECT_IDENTIFIER = `test-project-id-${uuidV4()}`;
+            const TEST_SERVICE_NAME = `test-service-${uuidV4()}.googleapis.com`;
+            const ENABLE_SERVICE_REQUEST_SERVICE_NAME = `projects/${TEST_PROJECT_IDENTIFIER}/services/${TEST_SERVICE_NAME}`;
+
+            const mockApi = jest.fn();
+            mockGetProjectId.mockResolvedValueOnce(TEST_PROJECT_IDENTIFIER);
+            const enableServiceResponse = createEnableServiceResponse(
+                TEST_PROJECT_IDENTIFIER,
+                TEST_SERVICE_NAME,
+                true
+            );
+            const mockEnableServiceResponsePromise = jest.fn();
+
+            mockEnableServiceResponsePromise.mockResolvedValueOnce([
+                enableServiceResponse
+            ]);
+            mockEnableService.mockResolvedValueOnce([
+                {
+                    promise: mockEnableServiceResponsePromise
+                }
+            ]);
+
+            await expect(
+                initializeServiceAPIForProject(TEST_SERVICE_NAME, mockApi)
+            ).resolves.not.toThrow();
+
+            expect(mockGetProjectId).toHaveBeenCalledTimes(1);
+            expect(mockEnableService).toHaveBeenCalledTimes(1);
+            expect(mockEnableService.mock.calls[0][0].name).toBe(
+                ENABLE_SERVICE_REQUEST_SERVICE_NAME
+            );
+            expect(mockEnableServiceResponsePromise).toHaveBeenCalledTimes(1);
+            expect(mockApi.mock.instances.length).toBe(1);
+        });
+
+        test('projectIdentifier defined', async () => {
+            const TEST_PROJECT_IDENTIFIER = `test-project-id-${uuidV4()}`;
+            const TEST_SERVICE_NAME = `test-service-${uuidV4()}.googleapis.com`;
+            const ENABLE_SERVICE_REQUEST_SERVICE_NAME = `projects/${TEST_PROJECT_IDENTIFIER}/services/${TEST_SERVICE_NAME}`;
+
+            const mockApi = jest.fn();
+            const enableServiceResponse = createEnableServiceResponse(
+                TEST_PROJECT_IDENTIFIER,
+                TEST_SERVICE_NAME,
+                true
+            );
+            const mockEnableServiceResponsePromise = jest.fn();
+
+            mockEnableServiceResponsePromise.mockResolvedValueOnce([
+                enableServiceResponse
+            ]);
+            mockEnableService.mockResolvedValueOnce([
+                {
+                    promise: mockEnableServiceResponsePromise
+                }
+            ]);
+
+            await expect(
+                initializeServiceAPIForProject(
+                    TEST_SERVICE_NAME,
+                    mockApi,
+                    TEST_PROJECT_IDENTIFIER
+                )
+            ).resolves.not.toThrow();
+
+            expect(mockGetProjectId).not.toHaveBeenCalled();
+            expect(mockEnableService).toHaveBeenCalledTimes(1);
+            expect(mockEnableService.mock.calls[0][0].name).toBe(
+                ENABLE_SERVICE_REQUEST_SERVICE_NAME
+            );
+            expect(mockEnableServiceResponsePromise).toHaveBeenCalledTimes(1);
+            expect(mockApi.mock.instances.length).toBe(1);
+        });
+
+        afterEach(() => {
+            expect(mockListBillingAccounts).not.toHaveBeenCalled();
         });
     });
 

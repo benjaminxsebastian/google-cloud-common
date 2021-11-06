@@ -59,6 +59,28 @@ export declare function enableServiceForProject(serviceName: string, projectIden
 
 ```typescript
 /**
+ * initializeServiceAPIForProject
+ *
+ * Initializes the specified service for the project and returns its API
+ * library.
+ *
+ * @param {string} serviceName The service to enable.
+ * @param {any} api The api to initialize.
+ * @param {string} projectIdentifier The project identifier, if defined.
+ *      Otherwise, the projectIdentifier will be obtained.
+ *
+ * @returns {API} The project identifier.
+ */
+export async function initializeServiceAPIForProject<APILibrary>(
+    serviceName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    api: any,
+    projectIdentifier?: string
+): Promise<APILibrary> {
+```
+
+```typescript
+/**
  * validateCloudBillingAccount
  *
  * Validates the cloud billing account.

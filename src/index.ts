@@ -106,6 +106,31 @@ export async function enableServiceForProject(
 }
 
 /**
+ * initializeServiceAPIForProject
+ *
+ * Initializes the specified service for the project and returns its API
+ * library.
+ *
+ * @param {string} serviceName The service to enable.
+ * @param {any} api The api to initialize.
+ * @param {string} projectIdentifier The project identifier, if defined.
+ *      Otherwise, the projectIdentifier will be obtained.
+ *
+ * @returns {API} The project identifier.
+ */
+export async function initializeServiceAPIForProject<APILibrary>(
+    serviceName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    api: any,
+    projectIdentifier?: string
+): Promise<APILibrary> {
+    await enableServiceForProject(serviceName, projectIdentifier);
+    const apiLibrary = new api();
+
+    return apiLibrary;
+}
+
+/**
  * validateCloudBillingAccount
  *
  * Validates the cloud billing account.
@@ -164,9 +189,12 @@ export async function validateCloudBillingAccount(
 export async function initializeGoogleCloudCommon(
     projectIdentifier?: string
 ): Promise<CloudBillingClient> {
-    await enableServiceForProject(CLOUD_BILLING_API, projectIdentifier);
-    const cloudBillingClient = new CloudBillingClient();
-
+    const cloudBillingClient: CloudBillingClient =
+        await initializeServiceAPIForProject(
+            CLOUD_BILLING_API,
+            CloudBillingClient,
+            projectIdentifier
+        );
     await validateCloudBillingAccount(cloudBillingClient);
 
     return cloudBillingClient;
