@@ -26,8 +26,15 @@ import {
     ServiceUsageClient
 } from '@google-cloud/service-usage';
 
-const serviceUsageClient = new ServiceUsageClient();
+/**
+ * @returns {ServiceUsageClient} The ServiceUsageClient object used by this
+ *      project.
+ */
+export const serviceUsageClient = new ServiceUsageClient();
 
+/**
+ * @returns {string} The 'cloudbilling.googleapis.com' service.
+ */
 export const CLOUD_BILLING_API = 'cloudbilling.googleapis.com';
 
 /**

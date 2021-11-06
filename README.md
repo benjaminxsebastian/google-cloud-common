@@ -12,7 +12,26 @@ npm i @benjamin.x.sebastian/google-cloud-common
 
 ---
 
-## Methods in the google-cloud-common Library
+## Properties and Methods in the google-cloud-common Library
+
+### Properties
+
+```typescript
+/**
+ * @returns {ServiceUsageClient} The ServiceUsageClient object used by this
+ *      project.
+ */
+export const serviceUsageClient = new ServiceUsageClient();
+```
+
+```typescript
+/**
+ * @returns {string} The 'cloudbilling.googleapis.com' service.
+ */
+export const CLOUD_BILLING_API = 'cloudbilling.googleapis.com';
+```
+
+### Methods
 
 ```typescript
 /**
