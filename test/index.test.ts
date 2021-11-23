@@ -72,24 +72,26 @@ describe('Test functions in index: ', () => {
     });
 
     function createEnableServiceResponse(
-        projectIdentifier: string,
-        serviceName: string,
+        projectIdentifier: string | undefined,
+        serviceName: string | undefined,
         enabled?: boolean
     ): serviceUsageProtos.google.api.serviceusage.v1.EnableServiceResponse {
         const testService =
             new serviceUsageProtos.google.api.serviceusage.v1.Service();
 
-        testService.name = `projects/${projectIdentifier}/services/${serviceName}`;
-        testService.parent = `projects/${projectIdentifier}`;
-        if (enabled === undefined) {
-            testService.state =
-                serviceUsageProtos.google.api.serviceusage.v1.State.STATE_UNSPECIFIED;
-        } else if (enabled) {
-            testService.state =
-                serviceUsageProtos.google.api.serviceusage.v1.State.ENABLED;
-        } else {
-            testService.state =
-                serviceUsageProtos.google.api.serviceusage.v1.State.DISABLED;
+        if (projectIdentifier && serviceName) {
+            testService.name = `projects/${projectIdentifier}/services/${serviceName}`;
+            testService.parent = `projects/${projectIdentifier}`;
+            if (enabled === undefined) {
+                testService.state =
+                    serviceUsageProtos.google.api.serviceusage.v1.State.STATE_UNSPECIFIED;
+            } else if (enabled) {
+                testService.state =
+                    serviceUsageProtos.google.api.serviceusage.v1.State.ENABLED;
+            } else {
+                testService.state =
+                    serviceUsageProtos.google.api.serviceusage.v1.State.DISABLED;
+            }
         }
         const enableServiceResponse =
             new serviceUsageProtos.google.api.serviceusage.v1.EnableServiceResponse();
@@ -148,12 +150,10 @@ describe('Test functions in index: ', () => {
             const ENABLE_SERVICE_REQUEST_SERVICE_NAME = `projects/${TEST_PROJECT_IDENTIFIER}/services/${TEST_SERVICE_NAME}`;
 
             mockGetProjectId.mockResolvedValueOnce(TEST_PROJECT_IDENTIFIER);
-            const testService =
-                new serviceUsageProtos.google.api.serviceusage.v1.Service();
-            const enableServiceResponse =
-                new serviceUsageProtos.google.api.serviceusage.v1.EnableServiceResponse();
-
-            enableServiceResponse.service = testService;
+            const enableServiceResponse = createEnableServiceResponse(
+                undefined,
+                undefined
+            );
             const mockEnableServiceResponsePromise = jest.fn();
 
             mockEnableServiceResponsePromise.mockResolvedValueOnce([
@@ -171,6 +171,7 @@ describe('Test functions in index: ', () => {
                 `The service name in enableServiceResponse: ${enableServiceResponse.service?.name} does NOT match the service name in enableServiceRequest: ${ENABLE_SERVICE_REQUEST_SERVICE_NAME}!`
             );
 
+            expect(mockGetProjectId).toHaveBeenCalledBefore(mockEnableService);
             expect(mockGetProjectId).toHaveBeenCalledTimes(1);
             expect(mockEnableService).toHaveBeenCalledTimes(1);
             expect(mockEnableService.mock.calls[0][0].name).toBe(
@@ -358,6 +359,7 @@ describe('Test functions in index: ', () => {
                 initializeServiceAPIForProject(TEST_SERVICE_NAME, mockApi)
             ).resolves.not.toThrow();
 
+            expect(mockGetProjectId).toHaveBeenCalledBefore(mockEnableService);
             expect(mockGetProjectId).toHaveBeenCalledTimes(1);
             expect(mockEnableService).toHaveBeenCalledTimes(1);
             expect(mockEnableService.mock.calls[0][0].name).toBe(
@@ -397,6 +399,10 @@ describe('Test functions in index: ', () => {
                 )
             ).resolves.not.toThrow();
 
+            expect(mockEnableService).toHaveBeenCalledBefore(
+                mockEnableServiceResponsePromise
+            );
+            expect(mockEnableService).toHaveBeenCalledBefore(mockApi);
             expect(mockGetProjectId).not.toHaveBeenCalled();
             expect(mockEnableService).toHaveBeenCalledTimes(1);
             expect(mockEnableService.mock.calls[0][0].name).toBe(
@@ -551,6 +557,13 @@ describe('Test functions in index: ', () => {
             const cloudBillingClient = await initializeGoogleCloudCommon();
 
             expect(cloudBillingClient).not.toBeNull();
+            expect(mockGetProjectId).toHaveBeenCalledBefore(mockEnableService);
+            expect(mockEnableService).toHaveBeenCalledBefore(
+                mockEnableServiceResponsePromise
+            );
+            expect(mockEnableServiceResponsePromise).toHaveBeenCalledBefore(
+                mockListBillingAccounts
+            );
             expect(mockGetProjectId).toHaveBeenCalledTimes(1);
             expect(mockEnableService).toHaveBeenCalledTimes(1);
             expect(mockEnableService.mock.calls[0][0].name).toBe(

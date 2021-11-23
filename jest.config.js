@@ -7,5 +7,6 @@ module.exports = {
     transform: {
         '^.+\\.(ts|tsx)$': 'ts-jest'
     },
+    setupFilesAfterEnv: ['jest-extended/all'],
     testTimeout: 300000
 };
