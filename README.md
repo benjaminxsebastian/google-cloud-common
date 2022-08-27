@@ -110,7 +110,5 @@ export declare function initializeGoogleCloudCommon(projectIdentifier?: string):
 ---
 
 ## License
-
   - Apache Version 2.0
   - See [LICENSE](https://github.com/benjaminxsebastian/google-cloud-common/blob/main/LICENSE) for details.
-
